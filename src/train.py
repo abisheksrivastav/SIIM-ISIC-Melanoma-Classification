@@ -15,7 +15,7 @@ if __name__ =="__main__":
     epochs =10
     df = pd.read_csv("../input/train.csv")
     images = df.image_name.values.tolist()
-    images = [os.path.join(data_path,i + "jpg")for i in images]
+    images = [os.path.join(data_path,i + ".jpg")for i in images]
 
     targets = df.target.values
 
@@ -37,7 +37,7 @@ if __name__ =="__main__":
             )
 
     train_dataset = dataset.ClassificationDataset(image_paths = train_images,targets = train_targets,
-    resize=(227,227),
+    resize=(128,128),
     augmentations=aug)
     train_loader = torch.utils.data.DataLoader(
         train_dataset,batch_size=16,shuffle=True,num_workers=4

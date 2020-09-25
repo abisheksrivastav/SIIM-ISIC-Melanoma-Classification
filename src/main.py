@@ -11,9 +11,11 @@ import torch.nn as nn
 from apex import amp
 from sklearn import metrics
 from torch.nn import functional as F
+import engine 
+from dataset import ClassificationDataset
 
-from wtfml.data_loaders.image import ClassificationLoader
-from wtfml.engine import Engine
+#from wtfml.data_loaders.image import ClassificationLoader
+#from wtfml.engine import Engine
 from wtfml.utils import EarlyStopping
 
 
@@ -76,7 +78,7 @@ def train(fold):
     valid_images = [os.path.join(training_data_path, i + ".jpg") for i in valid_images]
     valid_targets = df_valid.target.values
 
-    train_dataset = ClassificationLoader(
+    train_dataset = ClassificationDataset(
         image_paths=train_images,
         targets=train_targets,
         resize=None,
@@ -87,7 +89,7 @@ def train(fold):
         train_dataset, batch_size=train_bs, shuffle=True, num_workers=4
     )
 
-    valid_dataset = ClassificationLoader(
+    valid_dataset = ClassificationDataset(
         image_paths=valid_images,
         targets=valid_targets,
         resize=None,
@@ -113,8 +115,8 @@ def train(fold):
     es = EarlyStopping(patience=5, mode="max")
 
     for epoch in range(epochs):
-        train_loss = Engine.train(train_loader, model, optimizer, device=device,fp16=True)
-        predictions, valid_loss = Engine.evaluate(
+        train_loss = engine.train(train_loader, model, optimizer, device=device)
+        predictions, valid_loss = engine.evaluate(
             train_loader, model, device=device
         )
         predictions = np.vstack((predictions)).ravel()
